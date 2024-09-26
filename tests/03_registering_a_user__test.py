@@ -25,7 +25,6 @@ def before_all(app):
 def test_register_user(app):
     with app.app_context():
         driver = get_driver()
-
         dao = AuthDAO(driver, os.environ.get('JWT_SECRET'))
 
         user = dao.register(email, password, name)
