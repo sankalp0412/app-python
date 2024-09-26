@@ -41,6 +41,8 @@ def test_authenticate_user(app):
 
         output = dao.authenticate(email, password)
 
+        
+
         assert output["userId"] is not None
         assert output["name"] == name
         assert "password" not in output
