@@ -18,26 +18,36 @@ class RatingDAO:
     """
     # tag::add[]
     def add(self, user_id, movie_id, rating):
-        def create_rating(tx,user_id,movie_id,rating):
-            query = """
-                    MATCH (m:Movie {tmdbId: $movie_id})
-                    MERGE (u)-[r:RATED]->(m)
-                    SET r.rating = $rating,
-                        r.timestamp = timestamp()
-                    RETURN m {
-                        .*,
-                        rating: r.rating
-                    } AS movie """
-            res = tx.run(query,movie_id=movie_id,rating=rating,user_id=user_id).single()
-            return res
+        # tag::create_rating[]
+        # Create function to save the rating in the database
+        def create_rating(tx, user_id, movie_id, rating):
+            return tx.run("""
+            MATCH (u:User {userId: $user_id})
+            MATCH (m:Movie {tmdbId: $movie_id})
+            MERGE (u)-[r:RATED]->(m)
+            SET r.rating = $rating,
+                r.timestamp = timestamp()
+            RETURN m {
+                .*,
+                rating: r.rating
+            } AS movie
+            """, user_id=user_id, movie_id=movie_id, rating=rating).single()
+        # end::create_rating[]
+
+        # tag::run_create_rating[]
         with self.driver.session() as session:
-            record = session.execute_write(create_rating,user_id=user_id,movie_id=movie_id,rating=rating)
+            record = session.execute_write(create_rating, user_id=user_id, movie_id=movie_id, rating=rating)
+        # end::run_create_rating[]
+
+            # tag::not_found[]
             if record is None:
-                return NotFoundException()
+                raise NotFoundException()
+            # end::not_found[]
 
+            # tag::return[]
             return record["movie"]
+            # end::return[]
     # end::add[]
-
 
     """
     Return a paginated list of reviews for a Movie.

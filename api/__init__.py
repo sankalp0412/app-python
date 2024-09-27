@@ -59,8 +59,8 @@ def create_app(test_config=None):
     jwt = JWTManager(app)
 
     CORS(app, 
-        resources={r"/*": {"origins": ["http://localhost:3000", "http://127.0.0.1:3000"]}}
-    )
+     resources={r"/*": {"origins": ["http://localhost:3000", "http://127.0.0.1:3000", "https://5000-neo4jgraphaca-apppython-4nk079q6mz2.ws-eu116.gitpod.io"]}})
+
     
     # Register Routes
     app.register_blueprint(auth_routes)
